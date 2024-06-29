@@ -1,0 +1,22 @@
+{
+  "name": "jingdoli-backend",
+  "version": "1.0.0",
+  "description": "Jingdoli_API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christabelaraba/jingdoli-backend.git"
+  },
+  "author": "Peakton-Dev Backend team",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/christabelaraba/jingdoli-backend/issues"
+  },
+  "homepage": "https://github.com/christabelaraba/jingdoli-backend#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
