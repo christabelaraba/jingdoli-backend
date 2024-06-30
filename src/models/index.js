@@ -12,6 +12,11 @@ const sequelize = new Sequelize(
 const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
+
+
 db.Product = require("./product")(sequelize, DataTypes);
+db.Enquiry = require("./enquiry")(sequelize, DataTypes);
+
+
 
 module.exports = db;
