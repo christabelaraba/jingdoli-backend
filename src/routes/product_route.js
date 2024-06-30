@@ -7,4 +7,7 @@ router.get("/products", product_controller.get_product_list);
 
 router.get("/products/:id", product_controller.get_product_details);
 router.post("/make_enquiry", product_controller.make_enquiry);
+router.post("/order_online", product_controller.order_online);
+
+
 module.exports = router;
