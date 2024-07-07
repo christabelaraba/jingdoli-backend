@@ -9,6 +9,21 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        
+            voltage: {
+                type: DataTypes.STRING,
+            allowNull: true,
+            },
+            altenator: {
+                type: DataTypes.STRING,
+            allowNull: true,
+            },
+            amp_per_phase: {
+                type: DataTypes.STRING,
+            allowNull: true,
+            },
+           
+        
         description: {
             type: DataTypes.STRING,
             allowNull: true,
