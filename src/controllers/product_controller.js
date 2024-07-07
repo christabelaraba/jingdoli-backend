@@ -2,7 +2,7 @@ const db = require("../models");
 // responsible for getting the product list
 exports.get_product_list = async (req, res) => {
     const products = await db.Product.findAll({
-        attributes: ['id', 'model', 'prime', 'createdAt']
+        attributes: ['id', 'model', 'prime', 'createdAt','picture_url']
     });
     if(products){
         res.json({
