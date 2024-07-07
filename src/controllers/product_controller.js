@@ -86,4 +86,32 @@ exports.make_enquiry = async(req, res) => {
             response_message: " Records could not be saved successfully",
         });
     }
-    }
+    };
+
+    exports.contact_us = async(req, res) => {
+
+        if(!req.body.first_name || !req.body.last_name || !req.body.phone_number || !req.body.message 
+           ){
+                return res.json({
+                return_code: "007",
+                response_message: "Please fill in the required fields"
+                });
+            }
+
+        //save contact details in the database
+        const contact_us = await db.Contact_us.create({
+        first_name: req.body.first_name, last_name: req.body.last_name, phone_number: req.body.phone_number,
+        email: req.body.email, message: req.body.message, created_at: req.body.created_at, updated_at: req.body.updated_at
+        });
+        if (contact_us) {
+            res.json({
+                response_code:'100',
+                response_message: "message has been saved successfully",
+            })
+        }else{
+            res.json({
+                response_code:'101',
+                response_message: " message could not be saved ",
+            });
+        }
+   }

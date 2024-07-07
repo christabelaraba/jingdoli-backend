@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const product_route = require("./src/routes/product_route");
@@ -7,7 +8,8 @@ const db = require("./src/models");
 
 const port = process.env.PORT;
 const app = express();
-
+// Use the CORS middleware
+app.use(cors());
 app.use(bodyParser.json());
 
 //app.use("/api", product_route);

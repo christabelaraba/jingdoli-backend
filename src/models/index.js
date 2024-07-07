@@ -17,6 +17,8 @@ db.sequelize = sequelize;
 db.Product = require("./product")(sequelize, DataTypes);
 db.Enquiry = require("./enquiry")(sequelize, DataTypes);
 db.Order_online = require("./order_online")(sequelize, DataTypes);
+db.Contact_us = require("./contact_us")(sequelize, DataTypes);
+
 
 
 
