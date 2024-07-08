@@ -2,8 +2,10 @@ const db = require("../models");
 // responsible for getting the product list
 exports.get_product_list = async (req, res) => {
     const products = await db.Product.findAll({
-        attributes: ['id', 'model', 'prime', 'createdAt','picture_url']
-    });
+        attributes: ['id', 'model', 'prime', 'createdAt','picture_url','description','voltage','engine','frequency','alternator',
+            'amp_per_phase','power','fuel_type','size','color','type','price','warranty','active_status','delete_status','other'
+        ] 
+        });
     if(products){
         res.json({
             response_code:'000',

@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
             allowNull: true,
             },
-            altenator: {
+            alternator: {
                 type: DataTypes.STRING,
             allowNull: true,
             },
@@ -59,6 +59,40 @@ module.exports = (sequelize, DataTypes) => {
             field: 'updated_at',
             type: DataTypes.DATE,
         },
+        power: {
+            type: DataTypes.STRING,
+        allowNull: true,
+        },
+        size: {
+            type: DataTypes.STRING,
+        allowNull: true,
+        },
+        color: {
+           type: DataTypes.STRING,
+      allowNull: true,
+        },
+        type: {
+            type: DataTypes.STRING,
+        allowNull: true,
+        },
+        warranty: {
+              type: DataTypes.STRING,
+        allowNull: true,
+        },
+        other: {
+         type: DataTypes.STRING,
+        allowNull: true,
+        },
+        active_status: {
+          type: DataTypes.INTEGER,
+     allowNull: true,
+        },
+        delete_status: {
+         type: DataTypes.INTEGER,
+      allowNull: false,    
+        },
+
+
     });
   
     return Product;
