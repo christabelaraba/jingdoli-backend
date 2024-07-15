@@ -86,10 +86,13 @@ module.exports = (sequelize, DataTypes) => {
         active_status: {
           type: DataTypes.INTEGER,
      allowNull: true,
+     defaultValue: true
         },
         delete_status: {
          type: DataTypes.INTEGER,
-      allowNull: false,    
+      allowNull: true,  
+      defaultValue: false
+  
         },
 
 

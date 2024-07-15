@@ -1,5 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const config = require('../config/config');
+
+
 const sequelize = new Sequelize(
   config.development.database,
   config.development.username,
@@ -9,6 +11,8 @@ const sequelize = new Sequelize(
     dialect: config.development.dialect,
   }
 );
+
+
 const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
@@ -18,6 +22,8 @@ db.Product = require("./product")(sequelize, DataTypes);
 db.Enquiry = require("./enquiry")(sequelize, DataTypes);
 db.Order_online = require("./order_online")(sequelize, DataTypes);
 db.Contact_us = require("./contact_us")(sequelize, DataTypes);
+db.User = require("./user")(sequelize, DataTypes);
+
 
 
 
