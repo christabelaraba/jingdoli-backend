@@ -95,7 +95,7 @@ if (user) {
 
 }
 
-exports.admin_login = async (req, res) =>{
+exports.admin_login = async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -125,7 +125,74 @@ exports.admin_login = async (req, res) =>{
 }
 
 
+exports.list_products = async (req, res) => {
+    const products = await db.Product.findAll({
+        attributes: ['id', 'model', 'prime', 'createdAt','picture_url','description','voltage','engine','frequency','alternator',
+            'amp_per_phase','power','fuel_type','size']});
+    if(products){
+        return res.json ({
+            response_code : "000",
+            response_message : "Records found",
+            data : products
+        })
+    }else{
+        return res.json({
+            response_code:'001',
+            response_message: " No records  found",
+        })
+    }
+} 
+
+
+exports.list_enquiries = async (req, res) => {
+    const enquiry = await db.Enquiry.findAll();
+    if(enquiry){
+        return res.json({
+            response_code : "000",
+            response_message : "Records found",
+            data : enquiry
+        })
+    }else{
+        return res.json({
+            response_code: "001",
+            response_message: "No records found",
+        })
+    }
+}
         
+
+exports.list_order = async (req, res) => {
+    const order = await db.Order_online.findAll();
+    if(order){
+        return res.json({
+            response_code : "101",
+            response_message : "order received",
+            data : order
+        })
+    }else{
+        return res.json({
+            response_code: "100",
+            response_message: "Order not received",
+        })
+    }
+}
+
+
+exports.list_contact = async (req, res) => {
+    const contact = await db.Contact_us.findAll();
+    if(contact){
+        return res.json({
+            response_code: "111",
+            response_message: "contact saved",
+            data : contact
+        })
+    }else{
+        return res.json({
+            response_code: "112",
+            response_message: "contact not saved",
+        })
+    }
+}
 
             
             
