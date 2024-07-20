@@ -27,6 +27,9 @@ router.post("/create_quote", admin_controller.create_quote);
 router.get("/quote", admin_controller.list_quotes);
 
 
+//search for the customer
+router.get("")
+
 
 
 

@@ -45,16 +45,34 @@ exports.get_product_details = async (req, res) => {
 exports.make_enquiry = async(req, res) => {
     console.log(req.body);
     //validation
-   if(!req.body.first_name || !req.body.last_name || !req.body.phone_number || !req.body.message){
+   if(!req.body.first_name || !req.body.last_name || !req.body.phone_number || !req.body.email || !req.body.message){
         return res.json({
         return_code: "004",
         response_message: "Please fill in the required fields"
         });
    }
+
+   let customer_id;
+
+   const customer = await db.Customer.findOne({ 
+        where: {first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email, phone_number: req.body.phone_number}
+    });
+
+    //the customer is an existing customer
+    if(customer){
+        customer_id = customer.id;
+    }else{
+        const customer_created = await db.Customer.create({
+            first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email, phone_number: req.body.phone_number
+        }); 
+
+        customer_id = customer_created.id;
+    }
+
+
    //save enquiry details in the database
    const enquiry_record = await db.Enquiry.create({
-    first_name: req.body.first_name, last_name: req.body.last_name, phone_number: req.body.phone_number,
-    email: req.body.email, message: req.body.message, product_id: req.body.product_id
+    customer_id: customer_id, message: req.body.message, product_id: req.body.product_id
    });
    if (enquiry_record) {
         res.json({
@@ -67,9 +85,10 @@ exports.make_enquiry = async(req, res) => {
             response_message: " Records could not be saved successfully",
         });
     }
-   
   
 };
+  
+
     exports.order_online = async(req, res) => {
          //save order details in the database
    const order_record = await db.Order_online.create({
