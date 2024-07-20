@@ -21,6 +21,16 @@ router.get("/order", admin_controller.list_order);
 // get the list of contact us
 router.get("/contact", admin_controller.list_contact);
 
+// create_quote endpoint 
+router.post("/create_quote", admin_controller.create_quote);
+
+router.get("/quote", admin_controller.list_quotes);
+
+
+
+
+
+
 
 
 

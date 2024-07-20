@@ -178,7 +178,7 @@ exports.list_order = async (req, res) => {
 }
 
 
-exports.list_contact = async (req, res) => {
+exports.list_contact = async (req , res) => {
     const contact = await db.Contact_us.findAll();
     if(contact){
         return res.json({
@@ -194,8 +194,55 @@ exports.list_contact = async (req, res) => {
     }
 }
 
+
+exports.create_quote = async (req , res) => {
+    
+    if(!req.body.id || !req.body.quote_id || !req.body.customer_id || !req.body.product_id || !req.body.price || !req.body.message ){
+        return res.json({
+             response_code: "878",
+            response_message: "Please fill in the required fields"
+
+        });
+    }
+  //save quote details in the database
+  const quote_record = await db.Quote.create({
+    id: req.body.id, quote_id: req.body.quote_id, customer_id: req.body.customer_id,
+    price: req.body.price, message: req.body.message
+    });
+
+    if(quote_record){
+        return res.json({
+            response_code: "007",
+            response_message: "Thank you. Quote received. Review underway."
+        });
+    }else{
+        res.json({
+            response_code: "008",
+            response_message: "Quote has not been received. Please resubmit."
+        });
+    }
+    
+}
+
+exports.list_quotes = async ( req , res) => {
+    const quote = await db.Quote.findAll();
+    if(quote){
+        return res.json({
+            response_code: "212",
+            response_message: "quote saved",
+            data : quote
+        })
+
+    }else{
+        return res.json({
+            response_code: "313",
+            response_message: "quote not saved",
+        })
+    }
+}
+
             
-            
+           
 
             
     
