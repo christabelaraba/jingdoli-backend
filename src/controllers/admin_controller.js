@@ -228,8 +228,7 @@ exports.get_new_quote_id = async(req, res) =>{
 
 
 exports.create_quote = async (req , res) => {
-    
-    if( !req.body.customer_id || !req.body.product_id || !req.body.price || !req.body.message ){
+    if( !req.body.product_id || !req.body.price || !req.body.message ){
         return res.json({
              response_code: "878",
             response_message: "Please fill in the required fields"
@@ -237,12 +236,30 @@ exports.create_quote = async (req , res) => {
         });
     }
 
-    const quote_id = await generate_quote_id();
+    let customer_id;
+    const customer = await db.Customer.findOne({ 
+        where: {first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email, phone_number: req.body.phone_number}
+    });
 
-  //save quote details in the database
-  const quote_record = await db.Quote.create({
-    id: req.body.id, quote_id: quote_id, customer_id: req.body.customer_id,
-    price: req.body.price, message: req.body.message
+    //the customer is an existing customer
+    if(customer){
+        customer_id = customer.id;
+    }else{
+        const customer_created = await db.Customer.create({
+            first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email, phone_number: req.body.phone_number, location: req.body.location
+        }); 
+
+        customer_id = customer_created.id;
+    }
+
+
+    const quote_id = await generate_quote_id();
+    
+
+    //save quote details in the database
+    const quote_record = await db.Quote.create({
+        id: req.body.id, quote_id: quote_id, customer_id: customer_id,
+        price: req.body.price, message: req.body.message, status: req.body.status
     });
 
     if(quote_record){
@@ -258,6 +275,7 @@ exports.create_quote = async (req , res) => {
     }
     
 }
+
 
 exports.list_quotes = async ( req , res) => {
     const quote = await db.Quote.findAll();
