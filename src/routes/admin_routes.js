@@ -28,7 +28,14 @@ router.get("/quote", admin_controller.list_quotes);
 
 
 //search for the customer
-router.get("")
+router.get("/get_customer", admin_controller.get_customer_details);
+
+//  generate quote id
+// router.get("/generate_quote_id", admin_controller.generate_quote_id);
+
+// get new quote id
+router.get("/get_new_quote_id", admin_controller.get_new_quote_id);
+
 
 
 

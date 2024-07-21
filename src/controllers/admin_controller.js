@@ -1,5 +1,6 @@
 const db = require("../models");
 const bcrypt = require("bcrypt");
+const { Op } = require("sequelize");
 
 
 //This function is for an admin to save or input products into the systems from the admin portal
@@ -195,18 +196,52 @@ exports.list_contact = async (req , res) => {
 }
 
 
+generate_quote_id = async () => {
+    let quote_id;
+    const latest_quote = await db.Quote.findOne({
+        order: [
+            ['created_at', 'DESC'],
+        ]
+    });
+
+
+    if (latest_quote) {
+        quote_id = Number(latest_quote.id) + 1;
+    }else{
+        quote_id = 1;
+    }
+
+    // Ensure the ID has at least 3 digits, padding with zeros if necessary
+    return "QT" + quote_id.toString().padStart(3, '0');
+}
+
+exports.get_new_quote_id = async(req, res) =>{
+    const quote_id = await generate_quote_id();
+    return res.json({
+        response_code: "000",
+        response_message: "Quote ID found",
+        data: quote_id
+   });
+}
+
+
+
+
 exports.create_quote = async (req , res) => {
     
-    if(!req.body.id || !req.body.quote_id || !req.body.customer_id || !req.body.product_id || !req.body.price || !req.body.message ){
+    if( !req.body.customer_id || !req.body.product_id || !req.body.price || !req.body.message ){
         return res.json({
              response_code: "878",
             response_message: "Please fill in the required fields"
 
         });
     }
+
+    const quote_id = await generate_quote_id();
+
   //save quote details in the database
   const quote_record = await db.Quote.create({
-    id: req.body.id, quote_id: req.body.quote_id, customer_id: req.body.customer_id,
+    id: req.body.id, quote_id: quote_id, customer_id: req.body.customer_id,
     price: req.body.price, message: req.body.message
     });
 
@@ -244,7 +279,33 @@ exports.list_quotes = async ( req , res) => {
             
            
 
-            
+exports.get_customer_details = async(req, res) => {
+    const name = req.query.name;
+
+    const customer = await db.Customer.findAll({
+        where: {
+            [Op.or]: {
+                first_name: name,
+                last_name: name,
+            },
+        }
+    });
+
+    if(customer.length > 0 ){
+        return res.json({
+            response_code: "213",
+            response_message: "customer records found",
+            data : customer
+        })
+
+    }else{
+        return res.json({
+            response_code: "214",
+            response_message: "customer record not found",
+        })
+    }
+
+}
     
     
 
