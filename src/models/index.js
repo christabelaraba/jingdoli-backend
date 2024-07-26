@@ -28,7 +28,9 @@ db.Customer = require("./customer")(sequelize, DataTypes);
 
 
 
-
+// Define relationships
+db.Enquiry.belongsTo(db.Customer, { foreignKey: 'customer_id', as: 'Customer' });
+db.Customer.hasMany(db.Enquiry, { foreignKey: 'customer_id', as: 'Enquiries' });
 
 
 

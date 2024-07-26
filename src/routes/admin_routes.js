@@ -14,9 +14,12 @@ router.get("/products", admin_controller.list_products);
 
 // get the list of enquiries
 router.get("/enquiries", admin_controller.list_enquiries);
+router.get("/enquiries/:id", admin_controller.get_enquiries_details);
+
 
 // get the list of orders
 router.get("/order", admin_controller.list_order);
+router.get("/order/:id", admin_controller.get_order_details);
 
 // get the list of contact us
 router.get("/contact", admin_controller.list_contact);
@@ -25,6 +28,7 @@ router.get("/contact", admin_controller.list_contact);
 router.post("/create_quote", admin_controller.create_quote);
 
 router.get("/quote", admin_controller.list_quotes);
+router.get("/quote/:id", admin_controller.get_quote_details);
 
 
 //search for the customer
@@ -37,6 +41,9 @@ router.get("/get_customer", admin_controller.get_customer_details);
 router.get("/get_new_quote_id", admin_controller.get_new_quote_id);
 
 
+//We want to create some endpoints for the statistics/dashboard
+
+router.get("/quotes_statistics", admin_controller.get_quotes_statistics);
 
 
 
