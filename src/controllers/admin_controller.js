@@ -1,96 +1,116 @@
 const db = require("../models");
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
+const jwt = require('jsonwebtoken');
 
 
 //This function is for an admin to save or input products into the systems from the admin portal
 exports.create_product = async (req, res) => {
 
-    //validations
-    if (!req.body.model || !req.body.description || !req.body.frequency || !req.body.fuel_type || !req.body.power || !req.body.voltage || !req.body.price || !req.body.amp_per_phase ||
-        !req.body.color || !req.body.alternator || !req.body.engine || !req.body.prime || !req.body.price || !req.body.size || !req.body.warranty ||
-        !req.body.type
-    ) {
-        return res.json({
-            response_code: "004",
-            response_message: "Please fill in the required fields"
-        });
-
-    }
-
-    const product = await db.Product.findOne({
-        where: { model: req.body.model }
-    });
-
-
-    if (product) {
-        return res.json({
-            response_code: "005",
-            response_message: "The product you are trying to create already exists"
-        });
-    } else {
-
-        //save product
-        //save enquiry details in the database
-        const product_record = await db.Product.create({
-            model: req.body.model, description: req.body.description, frequency: req.body.frequency,
-            fuel_type: req.body.fuel_type, power: req.body.power, amp_per_phase: req.body.amp_per_phase, voltage: req.body.voltage,
-            alternator: req.body.alternator, engine: req.body.engine, prime: req.body.prime, price: req.body.price, size: req.body.size, color: req.body.color, type: req.body.type, warranty: req.body.warranty, other: req.body.other, picture_url: req.body.picture_url
-        });
-
-        if (product_record) {
-            res.json({
-                response_code: '002',
-                response_message: "Records have been saved successfully",
-            })
-        } else {
-            res.json({
-                response_code: '001',
-                response_message: " Records could not be saved successfully",
+    try {
+        //validations
+        if (!req.body.model || !req.body.description || !req.body.frequency || !req.body.fuel_type || !req.body.power || !req.body.voltage || !req.body.price || !req.body.amp_per_phase ||
+            !req.body.color || !req.body.alternator || !req.body.engine || !req.body.prime || !req.body.price || !req.body.size || !req.body.warranty ||
+            !req.body.type
+        ) {
+            return res.json({
+                response_code: "004",
+                response_message: "Please fill in the required fields"
             });
+
         }
 
+        const product = await db.Product.findOne({
+            where: { model: req.body.model }
+        });
 
+
+        if (product) {
+            return res.json({
+                response_code: "005",
+                response_message: "The product you are trying to create already exists"
+            });
+        } else {
+
+            //save product
+            //save enquiry details in the database
+            const product_record = await db.Product.create({
+                model: req.body.model, description: req.body.description, frequency: req.body.frequency,
+                fuel_type: req.body.fuel_type, power: req.body.power, amp_per_phase: req.body.amp_per_phase, voltage: req.body.voltage,
+                alternator: req.body.alternator, engine: req.body.engine, prime: req.body.prime, price: req.body.price, size: req.body.size, color: req.body.color, type: req.body.type, warranty: req.body.warranty, other: req.body.other, picture_url: req.body.picture_url
+            });
+
+            if (product_record) {
+                res.json({
+                    response_code: '002',
+                    response_message: "Records have been saved successfully",
+                })
+            } else {
+                res.json({
+                    response_code: '001',
+                    response_message: " Records could not be saved successfully",
+                });
+            }
+
+        }
+
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
+        });
     }
 }
 
 
 exports.admin_register = async (req, res) => {
 
-    if (!req.body.first_name || !req.body.last_name || !req.body.password || !req.body.email || !req.body.username) {
-        return res.json({
-            response_code: "004",
-            response_message: "Please fill in the required fields"
-        });
-    }
+    try {
 
-    const user = await db.User.findOne({
-        where: { email: req.body.email }
-    });
+        if (!req.body.first_name || !req.body.last_name || !req.body.password || !req.body.email || !req.body.username) {
+            return res.json({
+                response_code: "004",
+                response_message: "Please fill in the required fields"
+            });
+        }
 
-    if (user) {
-        return res.json({
-            response_code: "010",
-            response_message: "User already exists"
+        const user = await db.User.findOne({
+            where: { email: req.body.email }
         });
 
-    } else {
-        const hashedpassword = await bcrypt.hash(req.body.password, 10);
+        if (user) {
+            return res.json({
+                response_code: "010",
+                response_message: "User already exists"
+            });
 
-        await db.User.create({
-            first_name: req.body.first_name, last_name: req.body.last_name, username: req.body.username, email: req.body.email,
-            password: hashedpassword, user_role: req.body.user_role,
+        } else {
+            const hashedpassword = await bcrypt.hash(req.body.password, 10);
 
+            await db.User.create({
+                first_name: req.body.first_name, last_name: req.body.last_name, username: req.body.username, email: req.body.email,
+                password: hashedpassword, user_role: req.body.user_role,
+
+            });
+
+            return res.json({
+                response_code: "014",
+                response_message: "User account has been created successfully"
+            });
+
+        }
+
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
         });
-
-        return res.json({
-            response_code: "014",
-            response_message: "User account has been created successfully"
-
-
-
-        });
-
     }
 
 }
@@ -98,33 +118,184 @@ exports.admin_register = async (req, res) => {
 
 
 exports.admin_login = async (req, res) => {
-    const email = req.body.email;
-    const password = req.body.password;
 
-    const user = await db.User.findOne({
-        where: { email: email }
-    });
+    try {
+        const email = req.body.email;
+        const password = req.body.password;
 
-    if (!user) {
-        return res.json({
-            response_code: "010",
-            response_message: "User not found"
+        const user = await db.User.findOne({
+            where: { email: email }
         });
-    } else {
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
+
+        if (!user) {
             return res.json({
-                response_code: "011",
-                response_message: "Invalid credentials"
+                response_code: "010",
+                response_message: "User not found"
             });
         } else {
-            return res.json({
-                response_code: "012",
-                response_message: "Login successful", data: user
-            });
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                return res.json({
+                    response_code: "011",
+                    response_message: "Invalid credentials"
+                });
+            } else {
+
+                //Generate a JWT token
+                const token = jwt.sign(
+                    { id: user.id, role: user.user_role },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '24h' }
+                );
+
+                const user_data = { ...user};
+                delete user_data.dataValues.password;
+                delete user_data.dataValues.createdAt;
+                delete user_data.dataValues.updatedAt;
+
+                return res.json({
+                    response_code: "012",
+                    response_message: "Login successful", 
+                    accessToken: token,
+                    data: user_data.dataValues
+                });
+            }
         }
+
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
+        });
     }
 }
+
+
+exports.admin_logout = async (req, res) => {
+    try {
+
+        const token = req.headers['authorization'] ? req.headers['authorization'].split(' ')[1] : null;
+        if (!token) {
+            return res.status(400).json({ response_code: "001", response_message: "No token provided" });
+        }
+
+        const decoded = jwt.decode(token);
+        if (decoded && decoded.exp) {
+            await db.Blacklisted_Token.create({
+                token: token,
+                expiry: new Date(decoded.exp * 1000)  // JWT exp is in seconds
+            });
+            res.status(200).json({ response_code: "000", response_message: "Successfully logged out" });
+        } else {
+            res.status(500).json({ response_code: "002", response_message: "Failed to decode token" });
+        }
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
+        });
+    }
+};
+
+
+exports.change_password = async (req, res) => {
+
+    try {
+
+        const { old_password, new_password, confirm_new_password } = req.body;
+
+        const user = await db.User.findByPk(req.user_id);
+        if(!user) {
+        return res.json({ response_code: "404", response_message: "User not found" });
+        }else {
+            const passwordIsValid = await bcrypt.compare(old_password, user.dataValues.password);
+            if(!passwordIsValid) {
+                return res.json({ response_code: "405", response_message: "Invalid password" });
+            }else {
+
+                if (new_password !== confirm_new_password) {
+                    return res.json({ response_code: "406", response_message: "Sorry, the new passwords you provided don't match. Please check and try again." });
+                }else{
+
+                    const hash_new_password = await bcrypt.hashSync(new_password, 10);
+                    user.password = hash_new_password;
+                    await user.save();
+
+                    return res.json({ response_code: "300", response_message: "Password changed successfully!" });
+                }
+
+            }
+        }
+
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
+        });
+    }
+
+}
+
+
+
+exports.update_profile = async (req, res) => {
+    try {
+
+        const { first_name, last_name, phone_number } = req.body;
+
+        const user = await db.User.findByPk(req.user_id);
+        if(!user) {
+        return res.json({ response_code: "404", response_message: "User not found" });
+        }else {
+            user.first_name = first_name;
+            user.last_name = last_name;
+            user.phone_number = phone_number;
+
+            await user.save();
+            return res.json({ response_code: "200", response_message: "Profile updated successfully!" });
+        }
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
+        });
+    }
+}
+
+
+
+exports.profile_details = async (req, res) => {
+    const user = await db.User.findByPk(req.user_id, {
+        attributes: { exclude: ['password', 'createdAt', 'updatedAt']}
+    });
+
+    if(!user) {
+        return res.json({ response_code: "404", response_message: "User not found" });
+    }else{
+        console.log(user.dataValues);
+
+        return res.json({ 
+            response_code: "000", 
+            response_message: "Profile details found", 
+            data: user.dataValues 
+        });
+    }
+
+}
+
+
 
 
 exports.list_products = async (req, res) => {
@@ -154,7 +325,7 @@ exports.list_enquiries = async (req, res) => {
                 model: db.Customer,
                 as: 'Customer',
                 attributes: [
-                    [db.sequelize.fn('concat', db.sequelize.col('first_name'), ' ', db.sequelize.col('last_name')), 'customer_name'],
+                    [db.sequelize.fn('concat', db.sequelize.col('Customer.first_name'), ' ', db.sequelize.col('Customer.last_name')), 'customer_name'],
                     'phone_number', // Include phone number
                     'email' // Include email
                 ]
@@ -196,90 +367,230 @@ exports.list_enquiries = async (req, res) => {
 
 
 exports.get_enquiries_details = async (req, res) => {
-    if (!req.params.id) {
-        return res.json({
-            response_code: "004",
-            response_message: "Please fill in the required fields"
+    try {
+
+    
+        if (!req.params.id) {
+            return res.json({
+                response_code: "004",
+                response_message: "Please fill in the required fields"
+            });
+        }
+
+        const enquiry = await db.Enquiry.findOne({
+            where: { id: req.params.id },
+            include: [{
+                model: db.Customer,
+                as: 'Customer',
+                attributes: [
+                    [db.sequelize.fn('concat', db.sequelize.col('Customer.first_name'), ' ', db.sequelize.col('Customer.last_name')), 'customer_name'],
+                    'phone_number',
+                    'email'
+                ]
+            }]
         });
-    }
 
-    const enquiry = await db.Enquiry.findOne({
-        where: { id: req.params.id },
-        include: [{
-            model: db.Customer,
-            as: 'Customer',
-            attributes: [
-                [db.sequelize.fn('concat', db.sequelize.col('first_name'), ' ', db.sequelize.col('last_name')), 'customer_name'],
-                'phone_number',
-                'email'
-            ]
-        }]
-    });
+        if (enquiry) {
+            const { Customer, ...enquiryData } = enquiry.toJSON();
+            const response = {
+                ...enquiryData,
+                customer_name: Customer ? Customer.customer_name : null,
+                phone_number: Customer ? Customer.phone_number : null,
+                email: Customer ? Customer.email : null
+            };
 
-    if (enquiry) {
-        const { Customer, ...enquiryData } = enquiry.toJSON();
-        const response = {
-            ...enquiryData,
-            customer_name: Customer ? Customer.customer_name : null,
-            phone_number: Customer ? Customer.phone_number : null,
-            email: Customer ? Customer.email : null
-        };
 
-        res.json({
-            response_code: '000',
-            response_message: "Records found",
-            data: response
-        });
-    } else {
-        res.json({
-            response_code: '001',
-            response_message: "No records found",
+            //Add reply of the enquiry to the enquiry data.
+            const enquiry_response = await db.Enquiry_Response.findOne({
+                where: { enquiry_id: enquiry.id },
+                attributes: ['id', 'email', 'subject', 'message', 'createdAt'
+                ]
+            });
+
+            res.json({
+                response_code: '000',
+                response_message: "Records found",
+                data: {...response, reply_data: enquiry_response}
+            });
+        } else {
+            res.json({
+                response_code: '001',
+                response_message: "No records found",
+            });
+        }
+
+    } catch (error) {
+        console.error('Error fetching enquiries:', error);
+        return res.status(500).json({
+            response_code: "999",
+            response_message: "Internal server error"
         });
     }
 };
 
 
+exports.reply_enquiry = async (req, res) => {
+
+    try {
+
+        const { id, subject, message } = req.body;
+        const user_id = req.user_id; //the admin user responding to the enquiry
+
+        const enquiry = await db.Enquiry.findOne({
+            where: { id: id },
+            include: [{
+                model: db.Customer,
+                as: 'Customer',
+                attributes: [
+                    'first_name',
+                    'last_name',
+                    'phone_number',
+                    'email'
+                ]
+            }]
+        });
+
+        if(!enquiry){
+            res.json({
+                response_code: '001',
+                response_message: "No records found",
+            });
+        }else{
+
+
+            const { Customer, ...enquiryData } = enquiry.toJSON();
+            const response = {
+                ...enquiryData,
+                first_name: Customer ? Customer.first_name : null,
+                last_name: Customer ? Customer.last_name : null,
+                phone_number: Customer ? Customer.phone_number : null,
+                email: Customer ? Customer.email : null
+            };
+
+            //create / save the response in the database
+            await db.Enquiry_Response.create({
+                enquiry_id: id, email: response.email, subject, message, user_id
+            });
+
+
+            // send an actual email to the customer using an actual email service
+
+            res.json({
+                response_code: '000',
+                response_message: "Enquiry response saved and sent successfully"
+            });
+        }
+
+    } catch (error) {
+        console.error('Error fetching enquiries:', error);
+        return res.status(500).json({
+            response_code: "999",
+            response_message: "Internal server error"
+        });
+    }
+
+};
+
+
 exports.list_order = async (req, res) => {
-    const order = await db.Order_online.findAll();
-    if (order) {
-        return res.json({
-            response_code: "101",
-            response_message: "order received",
-            data: order
-        })
-    } else {
-        return res.json({
-            response_code: "100",
-            response_message: "Order not received",
-        })
+    try {
+
+        const order = await db.Order_online.findAll();
+        if (order) {
+            return res.json({
+                response_code: "101",
+                response_message: "order received",
+                data: order
+            })
+        } else {
+            return res.json({
+                response_code: "100",
+                response_message: "Order not received",
+            })
+        }
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
+        });
     }
 }
 
 
 
+exports.update_order = async (req, res) => {
+
+    try {
+        const { id, price, quantity, order_status, payment_status, payment_method } = req.body;
+        const user_id = req.user_id; //the admin user responding to the order
+
+
+        const order = await db.Order_online.findByPk(id);
+        if(!order) {
+           return res.json({ response_code: "404", response_message: "Order record not found" });
+        }else {
+            order.price = price;
+            order.quantity = quantity;
+            const total = Number(price) * Number(quantity);
+            order.total = total;
+            order.order_status = order_status;
+            order.payment_status = payment_status;
+            order.payment_method = payment_method;
+            order.user_id = user_id;
+    
+            await order.save();
+
+            return res.json({ response_code: "200", response_message: "Your changes have been saved successfully. You can go back to orders or keep editing" });
+        }
+
+    } catch (error) {
+        console.error('Error fetching enquiries:', error);
+        return res.status(500).json({
+            response_code: "999",
+            response_message: "Internal server error"
+        });
+    }
+
+};
+
+
 exports.get_order_details = async (req, res) => {
+    try {
+    
+        if (!req.params.id) {
+            return res.json({
+                response_code: "004",
+                response_message: "Please fill in the required fields"
+            });
+        }
 
-    if (!req.params.id) {
-        return res.json({
-            response_code: "004",
-            response_message: "Please fill in the required fields"
+        const order = await db.Order_online.findOne({
+            where: { id: req.params.id }
         });
-    }
+        if (order) {
+            res.json({
+                response_code: '000',
+                response_message: "Records found",
+                data: order
+            });
+        }
+        else {
+            res.json({
+                response_code: '001',
+                response_message: " No records  found",
+            });
+        }
 
-    const order = await db.Order_online.findOne({
-        where: { id: req.params.id }
-    });
-    if (order) {
-        res.json({
-            response_code: '000',
-            response_message: "Records found",
-            data: order
-        });
-    }
-    else {
-        res.json({
-            response_code: '001',
-            response_message: " No records  found",
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
         });
     }
 
@@ -335,49 +646,62 @@ exports.get_new_quote_id = async (req, res) => {
 
 
 exports.create_quote = async (req, res) => {
-    if (!req.body.product_id || !req.body.price || !req.body.message) {
-        return res.json({
-            response_code: "878",
-            response_message: "Please fill in the required fields"
+    try {
 
-        });
-    }
+    
+        if (!req.body.product_id || !req.body.price || !req.body.message) {
+            return res.json({
+                response_code: "878",
+                response_message: "Please fill in the required fields"
 
-    let customer_id;
-    const customer = await db.Customer.findOne({
-        where: { first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email, phone_number: req.body.phone_number }
-    });
+            });
+        }
 
-    //the customer is an existing customer
-    if (customer) {
-        customer_id = customer.id;
-    } else {
-        const customer_created = await db.Customer.create({
-            first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email, phone_number: req.body.phone_number, location: req.body.location
+        let customer_id;
+        const customer = await db.Customer.findOne({
+            where: { first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email, phone_number: req.body.phone_number }
         });
 
-        customer_id = customer_created.id;
-    }
+        //the customer is an existing customer
+        if (customer) {
+            customer_id = customer.id;
+        } else {
+            const customer_created = await db.Customer.create({
+                first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email, phone_number: req.body.phone_number, location: req.body.location
+            });
+
+            customer_id = customer_created.id;
+        }
 
 
-    const quote_id = await generate_quote_id();
+        const quote_id = await generate_quote_id();
 
 
-    //save quote details in the database
-    const quote_record = await db.Quote.create({
-        id: req.body.id, quote_id: quote_id, customer_id: customer_id,
-        price: req.body.price, message: req.body.message, status: req.body.status
-    });
-
-    if (quote_record) {
-        return res.json({
-            response_code: "007",
-            response_message: "Thank you. Quote received. Review underway."
+        //save quote details in the database
+        const quote_record = await db.Quote.create({
+            id: req.body.id, quote_id: quote_id, customer_id: customer_id,
+            price: req.body.price, message: req.body.message, status: req.body.status
         });
-    } else {
-        res.json({
-            response_code: "008",
-            response_message: "Quote has not been received. Please resubmit."
+
+        if (quote_record) {
+            return res.json({
+                response_code: "007",
+                response_message: "Thank you. Quote received. Review underway."
+            });
+        } else {
+            res.json({
+                response_code: "008",
+                response_message: "Quote has not been received. Please resubmit."
+            });
+        }
+
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
         });
     }
 
@@ -464,59 +788,111 @@ exports.get_customer_details = async (req, res) => {
 
 
 exports.get_quotes_statistics = async (req, res) => {
-    //Here will get the count or number of the following:
-    // 1. all quotes in the system
-    // 2. pending quotes
-    // 3. approved quotes
-    // 4. Rejected quotes
-
-    //total quotes in the system(quotes that haven't been deleted)
-    const totalQuoteCount = await db.Quote.count({
-        where: {
-            del_status: false
-        },
-    });
-    
-    console.log(`totalQuoteCount: ${totalQuoteCount}`);
-
-    // Here are the statuses of the quotes: 
-        // P means Pending, A means Approved, R means Rejected
-
-    //pending quotes in the system
-    const pendingQuoteCount = await db.Quote.count({
-        where: {
-            status: 'P',
-            del_status: false
-        },
-    });
-
-
-    //approved quotes in the system
-    const approvedQuoteCount = await db.Quote.count({
-        where: {
-            status: 'A',
-            del_status: false
-        },
-    });
-
-    //rejected quotes in the system
-    const rejectedQuoteCount = await db.Quote.count({
-        where: {
-            status: 'R',
-            del_status: false
-        },
-    });
+    try {
 
     
-    return res.json({
-        response_code: "315",
-        response_message: "Statistics records found",
-        data: { 
-                totalQuoteCount: totalQuoteCount, 
-                pendingQuoteCount: pendingQuoteCount, 
-                approvedQuoteCount: approvedQuoteCount, 
-                rejectedQuoteCount: rejectedQuoteCount
-            }
-    });
+        //Here will get the count or number of the following:
+        // 1. all quotes in the system
+        // 2. pending quotes
+        // 3. approved quotes
+        // 4. Rejected quotes
+
+        //total quotes in the system(quotes that haven't been deleted)
+        const totalQuoteCount = await db.Quote.count({
+            where: {
+                del_status: false
+            },
+        });
+        
+        console.log(`totalQuoteCount: ${totalQuoteCount}`);
+
+        // Here are the statuses of the quotes: 
+            // P means Pending, A means Approved, R means Rejected
+
+        //pending quotes in the system
+        const pendingQuoteCount = await db.Quote.count({
+            where: {
+                status: 'P',
+                del_status: false
+            },
+        });
+
+
+        //approved quotes in the system
+        const approvedQuoteCount = await db.Quote.count({
+            where: {
+                status: 'A',
+                del_status: false
+            },
+        });
+
+        //rejected quotes in the system
+        const rejectedQuoteCount = await db.Quote.count({
+            where: {
+                status: 'R',
+                del_status: false
+            },
+        });
+
+        
+        return res.json({
+            response_code: "315",
+            response_message: "Statistics records found",
+            data: { 
+                    totalQuoteCount: totalQuoteCount, 
+                    pendingQuoteCount: pendingQuoteCount, 
+                    approvedQuoteCount: approvedQuoteCount, 
+                    rejectedQuoteCount: rejectedQuoteCount
+                }
+        });
+
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
+        });
+    }
 
 }
+
+
+
+
+exports.update_settings = async (req, res) => {
+    try {
+    
+        const { email_notify, sms_notify } = req.body;
+
+        const user_settings = await db.User_settings.findOne({
+            where: { user_id: req.user_id }
+        });
+
+        if(!user_settings) {
+
+            await db.User_settings.create({
+                user_id: req.user_id, email_notify, sms_notify
+            })
+
+        return res.json({ response_code: "200", response_message: "User settings have been updated successfully!" });
+        }else {
+            user_settings.email_notify = email_notify;
+            user_settings.sms_notify = sms_notify;
+
+            await user_settings.save();
+            return res.json({ response_code: "200", response_message: "User settings have been updated successfully!" });
+        }
+
+    } catch (error) {
+        // Error handling
+        console.error("Error saving contact message:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Sorry, something went wrong. Please try again",
+            error: error.message
+        });
+    }
+}
+

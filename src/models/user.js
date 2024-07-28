@@ -9,29 +9,33 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        
+
         last_name: {
-                type: DataTypes.STRING,
+            type: DataTypes.STRING,
             allowNull: false,
-            },
-            username: {
-                type: DataTypes.STRING,
+        },
+        username: {
+            type: DataTypes.STRING,
             allowNull: false,
-            },
-            password: {
-                type: DataTypes.STRING,
+        },
+        password: {
+            type: DataTypes.STRING,
             allowNull: false,
-            },
-            email: {
-                type: DataTypes.STRING,
+        },
+        email: {
+            type: DataTypes.STRING,
             allowNull: true,
-            },
-            user_role: {
-                type: DataTypes.STRING,
+        },
+        phone_number: {
+            type: DataTypes.STRING,
             allowNull: true,
-            },
-        
-            active_status: {
+        },
+        user_role: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+
+        active_status: {
             type: DataTypes.BOOLEAN,
             allowNull: true,
             defaultValue: true
@@ -43,11 +47,11 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: false
         },
     },
-    {
-        timestamps: true, // Enable automatic timestamp management
-        underscored: true, // Use underscored field names
-      });
-  
-  
+        {
+            timestamps: true, // Enable automatic timestamp management
+            underscored: true, // Use underscored field names
+        });
+
+
     return User;
 };

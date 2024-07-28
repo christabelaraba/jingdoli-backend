@@ -34,13 +34,41 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
         },
         company_name: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-      power_required: {
-      type: DataTypes.STRING,
-      allowNull: true,
-},
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        power_required: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        price: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+        },
+        quantity: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        total: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+        },
+        order_status: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        payment_status: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        payment_method: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        user_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
     });
     return Order_online;
 };

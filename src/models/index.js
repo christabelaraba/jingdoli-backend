@@ -25,6 +25,9 @@ db.Contact_us = require("./contact_us")(sequelize, DataTypes);
 db.User = require("./user")(sequelize, DataTypes);
 db.Quote = require("./quote")(sequelize, DataTypes);
 db.Customer = require("./customer")(sequelize, DataTypes);
+db.Enquiry_Response = require("./enquiry_responses")(sequelize, DataTypes);
+db.Blacklisted_Token = require("./blacklisted_tokens")(sequelize, DataTypes);
+db.User_settings = require("./user_settings")(sequelize, DataTypes);
 
 
 

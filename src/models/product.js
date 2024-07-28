@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Product = sequelize.define('Product', {
+    const Product = sequelize.define('product', {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
@@ -9,28 +9,27 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        
-            voltage: {
-                type: DataTypes.STRING,
+        voltage: {
+            type: DataTypes.STRING,
             allowNull: true,
-            },
-            alternator: {
-                type: DataTypes.STRING,
+        },
+        alternator: {
+            type: DataTypes.STRING,
             allowNull: true,
-            },
-            amp_per_phase: {
-                type: DataTypes.STRING,
+        },
+        amp_per_phase: {
+            type: DataTypes.STRING,
             allowNull: true,
-            },
-            engine: {
-                type: DataTypes.STRING,
+        },
+        engine: {
+            type: DataTypes.STRING,
             allowNull: true,
-            },
-            picture_url: {
-                type: DataTypes.STRING,
+        },
+        picture_url: {
+            type: DataTypes.STRING,
             allowNull: true,
-            },
-        
+        },
+
         description: {
             type: DataTypes.STRING,
             allowNull: true,
@@ -61,42 +60,42 @@ module.exports = (sequelize, DataTypes) => {
         },
         power: {
             type: DataTypes.STRING,
-        allowNull: true,
+            allowNull: true,
         },
         size: {
             type: DataTypes.STRING,
-        allowNull: true,
+            allowNull: true,
         },
         color: {
-           type: DataTypes.STRING,
-      allowNull: true,
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         type: {
             type: DataTypes.STRING,
-        allowNull: true,
+            allowNull: true,
         },
         warranty: {
-              type: DataTypes.STRING,
-        allowNull: true,
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         other: {
-         type: DataTypes.STRING,
-        allowNull: true,
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         active_status: {
-          type: DataTypes.INTEGER,
-     allowNull: true,
-     defaultValue: true
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            defaultValue: true
         },
         delete_status: {
-         type: DataTypes.INTEGER,
-      allowNull: true,  
-      defaultValue: false
-  
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            defaultValue: false
+
         },
 
 
     });
-  
+
     return Product;
 };
