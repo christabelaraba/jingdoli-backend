@@ -116,6 +116,34 @@ exports.admin_register = async (req, res) => {
 }
 
 
+exports.get_users = async (req, res) => {
+    try {
+        const users = await db.User.findAll({
+            where: { del_status: false },
+            attributes: { exclude: ['password'] } // Exclude password from the results for security
+        });
+        if (users.length > 0) {
+            return res.json({
+                response_code: "000",
+                response_message: "Users retrieved successfully",
+                data: users
+            });
+        } else {
+            return res.json({
+                response_code: "001",
+                response_message: "No users found"
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Internal server error",
+            error: error.message
+        });
+    }
+};
+
 
 exports.admin_login = async (req, res) => {
 
@@ -133,6 +161,21 @@ exports.admin_login = async (req, res) => {
                 response_message: "User not found"
             });
         } else {
+
+            if (user.active_status != true) {
+                return res.json({
+                    response_code: "011",
+                    response_message: "Sorry, your account has been deactivated. Kindly contact the administrator"
+                });
+            }
+
+            if (user.del_status == true) {
+                return res.json({
+                    response_code: "010",
+                    response_message: "User not found"
+                });
+            }
+
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
                 return res.json({
@@ -277,14 +320,18 @@ exports.update_profile = async (req, res) => {
 
 
 exports.profile_details = async (req, res) => {
-    const user = await db.User.findByPk(req.user_id, {
-        attributes: { exclude: ['password', 'createdAt', 'updatedAt']}
+    console.log(req.user_id);
+    const user = await db.User.findOne({
+        where: {
+            id: req.user_id,
+            del_status: false
+        },
+        attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
     });
 
     if(!user) {
         return res.json({ response_code: "404", response_message: "User not found" });
     }else{
-        console.log(user.dataValues);
 
         return res.json({ 
             response_code: "000", 
@@ -296,6 +343,38 @@ exports.profile_details = async (req, res) => {
 }
 
 
+
+exports.delete_user = async (req, res) => {
+    try {
+        const id = req.params.id; // Assuming ID is passed via route parameters
+        const user = await db.User.findByPk(id);
+
+        if (!user) {
+            return res.status(404).json({
+                response_code: "002",
+                response_message: "User not found"
+            });
+        }
+
+        user.active_status = false;
+        user.del_status = true;
+
+        await user.save();
+
+        return res.json({
+            response_code: "003",
+            response_message: "User deleted successfully"
+        });
+
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({
+            response_code: '999',
+            response_message: "Internal server error",
+            error: error.message
+        });
+    }
+};
 
 
 exports.list_products = async (req, res) => {
@@ -320,10 +399,26 @@ exports.list_products = async (req, res) => {
 
 exports.list_enquiries = async (req, res) => {
     try {
+        // Build the where clause dynamically based on req.query
+        let enquiryWhereClause = {};
+        let customerWhereClause = {};
+
+        if (req.query.customer_id) {
+            customerWhereClause.id = req.query.customer_id;
+        }
+
+        if (req.query.start_date && req.query.end_date) {
+            enquiryWhereClause.createdAt = {
+                [db.Sequelize.Op.between]: [new Date(req.query.start_date), new Date(req.query.end_date)]
+            };
+        }
+
         const enquiries = await db.Enquiry.findAll({
+            where: enquiryWhereClause,
             include: [{
                 model: db.Customer,
                 as: 'Customer',
+                where: customerWhereClause,
                 attributes: [
                     [db.sequelize.fn('concat', db.sequelize.col('Customer.first_name'), ' ', db.sequelize.col('Customer.last_name')), 'customer_name'],
                     'phone_number', // Include phone number
@@ -337,9 +432,9 @@ exports.list_enquiries = async (req, res) => {
             const { Customer, ...enquiryData } = enquiry.toJSON();
             return {
                 ...enquiryData,
-                customer_name: Customer.customer_name, // Add the customer_name directly to the root
-                phone_number: Customer.phone_number, // Add the phone_number directly to the root
-                email: Customer.email // Add the email directly to the root
+                customer_name: Customer ? Customer.customer_name : '',
+                phone_number: Customer ? Customer.phone_number : '',
+                email: Customer ? Customer.email : ''
             };
         });
 
@@ -359,7 +454,8 @@ exports.list_enquiries = async (req, res) => {
         console.error('Error fetching enquiries:', error);
         return res.status(500).json({
             response_code: "999",
-            response_message: "Internal server error"
+            response_message: "Internal server error",
+            error: error.message
         });
     }
 };
@@ -648,7 +744,6 @@ exports.get_new_quote_id = async (req, res) => {
 exports.create_quote = async (req, res) => {
     try {
 
-    
         if (!req.body.product_id || !req.body.price || !req.body.message) {
             return res.json({
                 response_code: "878",
@@ -679,7 +774,7 @@ exports.create_quote = async (req, res) => {
 
         //save quote details in the database
         const quote_record = await db.Quote.create({
-            id: req.body.id, quote_id: quote_id, customer_id: customer_id,
+            quote_id: quote_id, customer_id: customer_id,
             price: req.body.price, message: req.body.message, status: req.body.status
         });
 
@@ -709,21 +804,50 @@ exports.create_quote = async (req, res) => {
 
 
 exports.list_quotes = async (req, res) => {
-    const quote = await db.Quote.findAll();
-    if (quote) {
-        return res.json({
-            response_code: "212",
-            response_message: "quote saved",
-            data: quote
-        })
+    try {
+        // Build the where clause dynamically based on req.params
+        let whereClause = {};
 
-    } else {
-        return res.json({
-            response_code: "313",
-            response_message: "quote not saved",
-        })
+        if (req.query.customer_id) {
+            whereClause.customer_id = req.query.customer_id;
+        }
+
+        if (req.query.status) {
+            whereClause.status = req.query.status;
+        }
+
+        if (req.query.start_date && req.query.end_date) {
+            whereClause.created_at = {
+                [db.Sequelize.Op.between]: [new Date(req.query.start_date), new Date(req.query.end_date)]
+            };
+        }
+
+        const quotes = await db.Quote.findAll({
+            where: whereClause
+        });
+
+        if (quotes && quotes.length > 0) {
+            return res.json({
+                response_code: "212",
+                response_message: "Quotes found",
+                data: quotes
+            });
+        } else {
+            return res.json({
+                response_code: "313",
+                response_message: "No records found"
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching quotes:", error);
+        return res.status(500).json({
+            response_code: "500",
+            response_message: "Internal server error",
+            error: error.message
+        });
     }
-}
+};
+
 
 
 

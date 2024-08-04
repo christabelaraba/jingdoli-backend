@@ -19,6 +19,13 @@ router.post("/update_settings", verifyToken, admin_controller.update_settings);
 router.get("/profile", verifyToken, admin_controller.profile_details);
 
 router.post("/create_user_account", verifyToken, admin_controller.admin_register);
+
+// Get all users
+router.get("/users", verifyToken, admin_controller.get_users);
+
+// Delete a user by ID
+router.delete("/user/:id", verifyToken, admin_controller.delete_user);
+
 router.post("/create_product", verifyToken, admin_controller.create_product);
 
 // get the list of products

@@ -18,7 +18,7 @@ exports.verifyToken = async (req, res, next) => {
         if (err) {
             return res.status(401).send({ message: "Unauthorized! Error: " + err.message });
         }
-        req.userId = decoded.id;
+        req.user_id = decoded.id;
         next();
     });
 };
